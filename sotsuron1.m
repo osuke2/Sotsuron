@@ -5,7 +5,8 @@ param = setPar();
 [decisions, r, w, KK, HH, mu] = model_solution(param);
 
 h = param.h;
-a_l = param.a_l; a_u = param.a_u; NA = param.NA;
+delta = param.delta;
+a_l = param.a_l; a_u = param.a_u; NA = param.NA; NH = param.NH;
 a = linspace(a_l, a_u, NA)';
 
 
@@ -26,7 +27,22 @@ title('INCOME DISTRIBUTION');
 xlabel('INCOME LEVEL');
 ylabel('% OF AGENTS');
 
+% GDPを初期化
+GDP = 0;
 
+% 各貯蓄グリッドと各能力グリッドにおいて、所得と確率密度関数を乗じて総和を取る
+for ia = 1:NA
+    for ih = 1:NH
+        % 消費
+        consume = (1 + r) * a(ia) + w * h(ih);
+        % 総消費量
+        GDP = GDP + consume * mu(ia, ih);
+    end
+end
+
+% 減耗量を加える
+GDP = GDP + delta * KK;
+disp(['GDP: ', num2str(GDP)]);
 
 function [transition_matrix, state_space] = tauchen(n, mu, rho, sigma)
      % tauchenの手法で関数を離散化
@@ -156,8 +172,8 @@ function [aplus,iaplus,c]=solve_household_gs(param,r,w)
                 [v_new(ia, ih), iaplus_new(ia, ih)] = max(reward(:, ia, ih)); % 最大値とそれを与える値
             end
         end
-
-        test = max(max(abs(iaplus_new - iaplus))); % 最適貯蓄量
+        % 最適貯蓄量
+        test = max(max(abs(iaplus_new - iaplus))); 
         v = v_new;
         iaplus = iaplus_new;
     end
