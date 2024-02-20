@@ -29,6 +29,7 @@ ylabel('% OF AGENTS');
 
 % GDPを初期化
 GDP = 0;
+<<<<<<< HEAD
 
 % 各貯蓄グリッドと各能力グリッドにおいて、所得と確率密度関数を乗じて総和を取る
 for ia = 1:NA
@@ -40,6 +41,19 @@ for ia = 1:NA
     end
 end
 
+=======
+
+% 各貯蓄グリッドと各能力グリッドにおいて、所得と確率密度関数を乗じて総和を取る
+for ia = 1:NA
+    for ih = 1:NH
+        % 消費
+        consume = (1 + r) * a(ia) + w * h(ih);
+        % 総消費量
+        GDP = GDP + consume * mu(ia, ih);
+    end
+end
+
+>>>>>>> cad23fc1b0bdb51a6a483c929cd738e59639ac31
 % 減耗量を加える
 GDP = GDP + delta * KK;
 disp(['GDP: ', num2str(GDP)]);
