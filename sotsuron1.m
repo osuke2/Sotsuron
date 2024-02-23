@@ -42,15 +42,7 @@ for ia = 1:NA
 end
 
 
-% 各貯蓄グリッドと各能力グリッドにおいて、所得と確率密度関数を乗じて総和を取る
-for ia = 1:NA
-    for ih = 1:NH
-        % 消費
-        consume = (1 + r) * a(ia) + w * h(ih);
-        % 総消費量
-        GDP = GDP + consume * mu(ia, ih);
-    end
-end
+
 
 
 % 減耗量を加える
