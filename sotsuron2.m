@@ -1,7 +1,6 @@
 clc
 clear all 
 close all
-
 param = setPar(); 
 [decisions, r, w, KK, HH, mu] = model_solution(param);
 
@@ -9,7 +8,6 @@ h = param.h;
 delta = param.delta;
 a_l = param.a_l; a_u = param.a_u; NA = param.NA; NH = param.NH;
 a = linspace(a_l, a_u, NA)';
-
 
 % 各グリッドでの収入を計算
 income = [(r*a + w*h(1)); (r*a + w*h(2))];
@@ -21,7 +19,6 @@ zip_lists = sortrows([income(:), mu(:)]);
 pinc = zip_lists(:, 1);
 pmu = zip_lists(:, 2);
 
-
 figure;
 plot(pinc, pmu);
 title('INCOME DISTRIBUTION');
@@ -30,7 +27,6 @@ ylabel('% OF AGENTS');
 
 % GDPを初期化
 GDP = 0;
-
 
 % 各貯蓄グリッドと各能力グリッドにおいて、所得と確率密度関数を乗じて総和を取る
 for ia = 1:NA
@@ -53,13 +49,13 @@ function [transition_matrix, state_space] = tauchen(n, mu, rho, sigma)
      % rho:AR(1)の係数
      % sigma:誤差項の標準偏差
 
-    m =1 / sqrt(1 - rho^2);
-     % 状態空間の作成
+    m = 1 / sqrt(1 - rho^2);
+    % 状態空間の作成
     state_space = linspace(mu - m*sigma, mu + m*sigma, n)';
      
-     %グリッドの距離
-    d =(state_space(n) - state_space(1))/ (n - 1);
-     % 遷移確率行列の計算
+    % グリッドの距離
+    d = (state_space(n) - state_space(1)) / (n - 1);
+    % 遷移確率行列の計算
     transition_matrix = zeros(n, n);
     for i = 1:n
         for j = 1:n
@@ -76,20 +72,19 @@ function [transition_matrix, state_space] = tauchen(n, mu, rho, sigma)
     end
 end
 
-
 function param = setPar(sigma, beta, delta, alpha, rho, a_l, a_u, NH, NA)
     % 各パラメータの値
- if nargin < 9
-    sigma = 1.50;   % リスク回避度
-    beta = 0.98;    % 時間的割引率
-    delta = 0.03;   % 減耗率
-    alpha = 0.25;   % 資本分配率
-    rho = 0.6;      % 能力値係数
-    a_l = 0;        % 貯蓄下限
-    a_u = 20;       % 貯蓄上限
-    NH = 2;         % 能力値グリッド数
-    NA = 401;       % 貯蓄グリッド数
- end
+    if nargin < 9
+        sigma = 1.50;   % リスク回避度
+        beta = 0.98;    % 時間的割引率
+        delta = 0.03;   % 減耗率
+        alpha = 0.25;   % 資本分配率
+        rho = 0.6;      % 能力値係数
+        a_l = 0;        % 貯蓄下限
+        a_u = 20;       % 貯蓄上限
+        NH = 2;        % 能力値グリッド数
+        NA = 401;        % 貯蓄グリッド数
+    end
     % 能力値の標準偏差
     sigma_eps = sqrt(0.6*(1-rho^2));
 
@@ -104,10 +99,8 @@ function param = setPar(sigma, beta, delta, alpha, rho, a_l, a_u, NH, NA)
         for ih = 1:NH % 今期
             for ihp = 1:NH % 来期
                 probst_new(ihp) = probst_new(ihp) + pi(ih, ihp)*probst(ih);
-                
             end
         end
-
         test = max(abs(probst_new - probst)); % 分布の差異
         probst = probst_new; % 分布を更新
     end
@@ -120,8 +113,8 @@ function param = setPar(sigma, beta, delta, alpha, rho, a_l, a_u, NH, NA)
     param.pi = pi; param.h = h; param.HH = HH;
     
 end
-function [aplus,iaplus,c]=solve_household_gs(param,r,w)
 
+function [aplus,iaplus,c]=solve_household_gs(param,r,w)
 
     % パラメータ格納
     a_l = param.a_l; a_u = param.a_u; pi = param.pi; delta = param.delta;
@@ -134,7 +127,7 @@ function [aplus,iaplus,c]=solve_household_gs(param,r,w)
     %　初期効用関数
     util = -10000.0 * ones(NA, NA, NH);
 
-        % 今期と来期の貯蓄とhから効用を計算
+    % 今期と来期の貯蓄とhから効用を計算
     for ia = 1:NA
         for iap = 1:NA
             for ih = 1:NH
@@ -145,7 +138,6 @@ function [aplus,iaplus,c]=solve_household_gs(param,r,w)
             end
         end
     end
-
 
     % いくつか初期化
     v = zeros(NA, NH);
@@ -235,10 +227,10 @@ function [decisions, r, w, KK, HH, mu] = model_solution(param)
         w = (1 - alpha) * KK^alpha * HH^(-alpha);
         r = alpha * KK^(alpha - 1) * HH^(1 - alpha) - delta;
 
-        %家計の問題
+        % 家計の問題
         [aplus, iaplus, c] = solve_household_gs(param, r, w);
         
-        %定常分布
+        % 定常分布
         mu = get_distribution(param, {[], iaplus});
 
         % 資本量を更新
